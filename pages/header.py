@@ -13,6 +13,7 @@ class Header(Page):
         self.click(*self.SEARCH_BTN)
 
     def input_search_text(self, text):
+        self.wait_for_element_appear(*self.SEARCH_FIELD)
         self.input_text(text, *self.SEARCH_FIELD)
 
     def verify_spf_result(self):
