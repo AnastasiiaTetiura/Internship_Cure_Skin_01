@@ -2,6 +2,7 @@ import allure
 from allure_commons.types import AttachmentType
 from selenium.webdriver.support.events import EventFiringWebDriver
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.firefox.options import Options
@@ -9,17 +10,31 @@ from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.support.wait import WebDriverWait
 from app.application import Application
 
+
+
 from support.logger import logger, MyListener
 
 #Allure command:
 #behave -f allure_behave.formatter:AllureFormatter -o test_report/ features/tests/SPF_search_result.feature
+#allure report command:
+#allure serve test_report/
 
 
+#def browser_init(context):
 def browser_init(context, test_name):
+
     """
     :param context: Behave context
     :param test_name: scenario.name
     """
+
+    mobile_emulation = {"deviceName": "iPhone 12 Pro"}
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
+    context.driver = webdriver.Chrome(executable_path='./chromdriver', options=chrome_options)
+
+
+    #context.driver = webdriver.Chrome(executable_path='./chromedriver')
     #service = Service('/Users/anastasiiatetiura/MyInternshipCure/chromedriver')
     #service = Service('/Users/anastasiiatetiura/MyInternshipCure/geckodriver')  #------FIREFOX
     #context.driver = webdriver.Chrome(service=service)
@@ -53,40 +68,39 @@ def browser_init(context, test_name):
     #context.driver = EventFiringWebDriver(webdriver.Chrome(chrome_options = options), MyListener())
 
     # BrowserStack
-    bs_user = 'anastasiiatetiur_oSxFA0'
-    bs_key = '2spffrK83i1Ne9zWpqT2'
-    desired_cap = {
-        'browserName': 'Firefox',
-        'bstack:options': {
-            'os': 'Windows',
-            'osVersion': '10',
-            'sessionName': test_name
-        }
-    }
-    url = f'http://{bs_user}:{bs_key}@hub-cloud.browserstack.com/wd/hub'
-    context.driver = webdriver.Remote(url, desired_capabilities=desired_cap)
+    #bs_user = 'anastasiiatetiur_oSxFA0'
+    #bs_key = '2spffrK83i1Ne9zWpqT2'
+    #desired_cap = {
+        #'browserName': 'Firefox',
+        #'bstack:options': {
+           # 'os': 'Windows',
+           # 'osVersion': '10',
+          #  'sessionName': test_name
+       # }
+    #}
+    #url = f'http://{bs_user}:{bs_key}@hub-cloud.browserstack.com/wd/hub'
+    #context.driver = webdriver.Remote(url, desired_capabilities=desired_cap)
 
     context.driver.maximize_window()
-    context.driver.implicitly_wait(5)
-    context.driver.wait = WebDriverWait(context.driver, 30)
-    context.app = Application(driver=context.driver)
+    context.driver.implicitly_wait(4)
+    context.driver.wait = WebDriverWait(context.driver, 10)
+    #context.app = Application(driver=context.driver)
     context.app = Application(context.driver)
 
 
 def before_scenario(context, scenario):
-    #print('\nStarted scenario: ', scenario.name)
-    logger.info(f'Started scenario: {scenario.name}')
+    print('\nStarted scenario: ', scenario.name)
     browser_init(context, scenario.name)
 
 
 def before_step(context, step):
-    #print('\nStarted step: ', step)
-    logger.info(f'Started step: {step}')
+    print('\nStarted step: ', step)
+    #logger.info(f'Started step: {step}')
 
 
 def after_step(context, step):
     if step.status == 'failed':
-        logger.error(f'Step failed: {step}')
+        #logger.error(f'Step failed: {step}')
         print('\nStep failed: ', step)
         # Mark test case as FAILED on BrowserStack:
         #context.driver.execute_script(
@@ -96,3 +110,5 @@ def after_step(context, step):
 def after_scenario(context, feature):
     context.driver.delete_all_cookies()
     context.driver.quit()
+
+

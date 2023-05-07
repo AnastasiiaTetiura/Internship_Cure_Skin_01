@@ -18,7 +18,7 @@ def click_search_button(context):
 @when('Search for the {item_text}')
 def input_search_item(context, item_text):
     context.app.header.input_search_text(item_text)
-    sleep(4)
+    #sleep(4)
 
 
 @then('Verify the results have SPF')
